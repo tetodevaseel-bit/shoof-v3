@@ -1,26 +1,18 @@
-import './style.css';
-import { createApp, ref } from 'vue';
-import router from './router/index.js';
-import { setToken } from './api.js';
-import LoginView from './views/LoginView.vue';
+import { Buffer } from 'buffer';
+window.Buffer = Buffer;
+globalThis.Buffer = Buffer;
+
+import { createApp } from 'vue';
+import { createRouter, createWebHashHistory } from 'vue-router';
 import App from './App.vue';
+import './style.css';
 
-async function bootstrap() {
-    // محاولة استعادة الجلسة المحفوظة
-    let savedToken = null;
-    try {
-        const { Preferences } = await import('@capacitor/preferences');
-        const { value } = await Preferences.get({ key: 'session_token' });
-        savedToken = value;
-    } catch {
-        savedToken = localStorage.getItem('session_token');
-    }
+const router = createRouter({
+    history: createWebHashHistory(),
+    routes: [
+        { path: '/', component: () => import('./views/HomeView.vue') },
+        { path: '/channel/:uuid', component: () => import('./views/ChannelView.vue'), props: true },
+    ],
+});
 
-    if (savedToken) {
-        setToken(savedToken);
-    }
-
-    createApp(App, { initialToken: savedToken }).use(router).mount('#app');
-}
-
-bootstrap();
+createApp(App).use(router).mount('#app');
