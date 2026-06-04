@@ -3,8 +3,6 @@ import { ref, onMounted } from 'vue';
 import LoginView from './views/LoginView.vue';
 
 const isLoggedIn = ref(false);
-const sessionToken = ref('');
-const tgUserId = ref('');
 
 onMounted(async () => {
     let saved = null;
@@ -16,35 +14,27 @@ onMounted(async () => {
         saved = localStorage.getItem('shoof_session');
     }
     if (saved) {
-        sessionToken.value = saved;
-        isLoggedIn.value = true;
+        goToShoof(saved);
     }
 });
 
-function onLoggedIn({ session, userId }) {
-    sessionToken.value = session || '';
-    tgUserId.value = userId || '';
-    isLoggedIn.value = true;
+function onLoggedIn({ session }) {
+    goToShoof(session);
 }
 
-function getShoofUrl() {
-    const base = 'https://shoof-tv.net';
-    const params = new URLSearchParams();
-    params.set('source', 'apk');
-    if (sessionToken.value) params.set('mobile_token', sessionToken.value);
-    return `${base}?${params.toString()}`;
+function goToShoof(token) {
+    // Navigate the entire WebView to shoof-tv.net — no iframe restrictions
+    const url = `https://shoof-tv.net?source=apk&mobile_token=${encodeURIComponent(token)}`;
+    window.location.replace(url);
 }
 </script>
 
 <template>
     <LoginView v-if="!isLoggedIn" @logged-in="onLoggedIn" />
-
-    <div v-else class="fixed inset-0 bg-black">
-        <iframe
-            :src="getShoofUrl()"
-            class="w-full h-full border-0"
-            allow="autoplay; fullscreen; encrypted-media"
-            allowfullscreen
-        ></iframe>
+    <div v-else class="fixed inset-0 bg-black flex items-center justify-center">
+        <div class="text-white text-center">
+            <div class="text-4xl mb-4">🎬</div>
+            <p class="text-gray-400">جاري التحميل...</p>
+        </div>
     </div>
 </template>
