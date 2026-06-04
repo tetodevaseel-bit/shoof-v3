@@ -1,7 +1,3 @@
-import { Buffer } from 'buffer';
-window.Buffer = Buffer;
-globalThis.Buffer = Buffer;
-
 import { createApp } from 'vue';
 import { createRouter, createWebHashHistory } from 'vue-router';
 import App from './App.vue';
