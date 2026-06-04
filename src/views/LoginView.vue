@@ -62,7 +62,7 @@ function startPolling() {
                 step.value = 'otp';
             } else if (data.status === 'expired') {
                 clearInterval(pollInterval);
-                error.value = 'انتهت صلاحية الرابط، حاول مجدداً';
+                error.value = 'انتهت صلاحية الرمز';
                 step.value = 'welcome';
             }
         } catch {}
@@ -125,6 +125,14 @@ async function submitOtp() {
 }
 
 onUnmounted(() => { if (pollInterval) clearInterval(pollInterval); });
+
+async function retryAuth() {
+    otp.value = ['', '', '', '', '', ''];
+    error.value = '';
+    if (pollInterval) clearInterval(pollInterval);
+    step.value = 'welcome';
+    await requestAuth();
+}
 </script>
 
 <template>
@@ -162,7 +170,7 @@ onUnmounted(() => { if (pollInterval) clearInterval(pollInterval); });
             </div>
             <div class="flex items-center gap-2 text-blue-400 text-sm">
                 <span class="animate-pulse">●</span>
-                <span>بانتظار تأكيدك على تيليجرام...</span>
+                <span>بانتظار تأكيدك على تيليجرام... (صالح 15 دقيقة)</span>
             </div>
         </div>
         <div class="pb-14 px-0 space-y-3">
@@ -195,6 +203,9 @@ onUnmounted(() => { if (pollInterval) clearInterval(pollInterval); });
         <button @click="submitOtp" :disabled="otp.join('').length !== 6 || loading"
             class="w-full py-4 rounded-2xl font-bold bg-blue-500 text-white active:scale-95 disabled:opacity-40">
             {{ loading ? 'جاري التحقق...' : 'تأكيد الدخول ←' }}
+        </button>
+        <button @click="retryAuth" class="w-full py-3 text-gray-500 text-sm mt-2">
+            لم يصل الرمز أو انتهت صلاحيته؟ اطلب رمزاً جديداً
         </button>
     </div>
 
