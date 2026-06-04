@@ -37,7 +37,17 @@ async function requestAuth() {
 }
 
 function openTelegram() {
-    window.open(deepLink.value, '_system');
+    // Convert https://t.me/Bot?start=X to tg://resolve?domain=Bot&start=X
+    const tgUrl = deepLink.value
+        .replace('https://t.me/', 'tg://resolve?domain=')
+        .replace('?start=', '&start=');
+    // Try tg:// first (opens Telegram directly), fallback to https
+    try {
+        window.location.href = tgUrl;
+        setTimeout(() => { window.open(deepLink.value, '_system'); }, 1500);
+    } catch {
+        window.open(deepLink.value, '_system');
+    }
 }
 
 function startPolling() {
