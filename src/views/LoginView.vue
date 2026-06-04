@@ -71,13 +71,25 @@ function startPolling() {
 
 function onOtpInput(i, e) {
     const val = e.target.value.replace(/\D/g, '');
-    otp.value[i] = val;
+    otp.value[i] = val ? val[val.length - 1] : '';
     if (val && i < 5) otpInputs.value[i + 1]?.focus();
     if (otp.value.join('').length === 6) submitOtp();
 }
 
 function onOtpKeydown(i, e) {
     if (e.key === 'Backspace' && !otp.value[i] && i > 0) otpInputs.value[i - 1]?.focus();
+}
+
+function onOtpPaste(e) {
+    e.preventDefault();
+    const pasted = (e.clipboardData || window.clipboardData).getData('text').replace(/\D/g, '').slice(0, 6);
+    if (!pasted) return;
+    for (let i = 0; i < 6; i++) {
+        otp.value[i] = pasted[i] || '';
+    }
+    const last = Math.min(pasted.length, 5);
+    otpInputs.value[last]?.focus();
+    if (pasted.length === 6) setTimeout(submitOtp, 100);
 }
 
 async function submitOtp() {
@@ -175,7 +187,7 @@ onUnmounted(() => { if (pollInterval) clearInterval(pollInterval); });
         <div class="flex gap-2 justify-center mb-6" dir="ltr">
             <input v-for="(_, i) in 6" :key="i" :ref="el => otpInputs[i] = el"
                 v-model="otp[i]" type="tel" inputmode="numeric" maxlength="1"
-                @input="onOtpInput(i, $event)" @keydown="onOtpKeydown(i, $event)"
+                @input="onOtpInput(i, $event)" @keydown="onOtpKeydown(i, $event)" @paste="onOtpPaste"
                 class="w-12 h-14 text-center text-2xl font-bold rounded-xl border-2 bg-white/8 outline-none transition-colors"
                 :class="otp[i] ? 'border-blue-500 text-white' : 'border-white/15 text-white'" />
         </div>
