@@ -2,6 +2,12 @@
   "appId": "tv.shoof.app",
   "appName": "شوف TV",
   "webDir": "dist",
+  "server": {
+    "allowNavigation": [
+      "shoof-tv.net",
+      "*.shoof-tv.net"
+    ]
+  },
   "plugins": {
     "Preferences": {}
   }
